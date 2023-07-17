@@ -1,25 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
+import 'dart:async';
 
-const Size defaultWindowSize = Size(400, 60);
+import 'package:flutter/material.dart';
+import 'package:flutter_win_resize_bug/winapi_helper.dart';
+
+const Size defaultWindowSize = Size(400, 100);
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-
-  WindowOptions windowOptions = const WindowOptions(
-    size: defaultWindowSize,
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.setAsFrameless();
-    await windowManager.show();
-    await windowManager.focus();
-  });
-
   runApp(const MyApp());
 }
 
@@ -30,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      color: Colors.transparent,
+      // color: Colors.transparent,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -52,7 +38,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool isExpanded = false;
   Size currentSize = defaultWindowSize;
-  Duration animationDuration = const Duration(milliseconds: 250);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _resizeWindow(defaultWindowSize);
+
+    // Timer.periodic(Duration(milliseconds: 200), (timer) {
+    //   _expandOrCollapse();
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,20 +57,19 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(),
         Positioned(
           bottom: 0,
-          child: AnimatedContainer(
+          child: Container(
             width: currentSize.width,
             height: currentSize.height,
-            curve: Curves.fastOutSlowIn,
-            duration: animationDuration,
-            color: Colors.black38,
+            color: Colors.red,
             child: Column(
               children: [
                 const Expanded(
                   child: SizedBox(),
                 ),
                 Container(
-                  height: defaultWindowSize.height,
+                  height: 100,
                   alignment: Alignment.center,
+                  // color: Colors.red,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -89,14 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: const TextStyle(color: Colors.white)),
                       ),
                       const Icon(Icons.cloud, color: Colors.white),
-                      IconButton(
-                          onPressed: () async {
-                            await windowManager.close();
-                          },
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                          )),
+                      const Icon(Icons.flag, color: Colors.white),
                     ],
                   ),
                 ),
@@ -110,28 +98,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future _expandOrCollapse() async {
     isExpanded = !isExpanded;
-    var newSize = isExpanded ? const Size(400, 200) : defaultWindowSize;
+    var newSize = isExpanded ? const Size(400, 300) : defaultWindowSize;
 
-    if (isExpanded) {
-      await _resizeWindow(newSize);
+    _resizeWindow(newSize);
+    if (mounted) {
       setState(() {
         currentSize = newSize;
       });
-    } else {
-      setState(() {
-        currentSize = newSize;
-      });
-      await Future.delayed(animationDuration);
-      await _resizeWindow(newSize);
     }
   }
 
-  Future _resizeWindow(Size newSize) async {
-    var currentBounds = await windowManager.getBounds();
+  void _resizeWindow(Size newSize) async {
+    var currentBounds = WinApiHelper.getBounds();
     var heightOffset = currentBounds.height - newSize.height;
     Rect newFrame = Rect.fromLTWH(currentBounds.left,
         currentBounds.top + heightOffset, newSize.width, newSize.height);
 
-    await windowManager.setBounds(newFrame);
+    await WinApiHelper.setBounds(newFrame);
   }
 }
