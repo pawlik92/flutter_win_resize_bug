@@ -52,47 +52,49 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const SizedBox(),
-        Positioned(
-          bottom: 0,
-          child: Container(
-            width: currentSize.width,
-            height: currentSize.height,
-            color: Colors.red,
-            child: Column(
-              children: [
-                const Expanded(
-                  child: SizedBox(),
-                ),
-                Container(
-                  height: 100,
-                  alignment: Alignment.center,
-                  // color: Colors.red,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      const Icon(Icons.home, color: Colors.white),
-                      const Icon(Icons.bug_report_outlined,
-                          color: Colors.white),
-                      TextButton(
-                        onPressed: () async {
-                          await _expandOrCollapse();
-                        },
-                        child: Text(isExpanded ? 'Collapse' : 'Expand',
-                            style: const TextStyle(color: Colors.white)),
-                      ),
-                      const Icon(Icons.cloud, color: Colors.white),
-                      const Icon(Icons.flag, color: Colors.white),
-                    ],
+    return ColoredBox(
+      color: Colors.green,
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 0,
+            child: Container(
+              width: defaultWindowSize.width,
+              height: defaultWindowSize.height,
+              color: Colors.orange,
+              child: Column(
+                children: [
+                  const Expanded(
+                    child: SizedBox(),
                   ),
-                ),
-              ],
+                  Container(
+                    height: 100,
+                    alignment: Alignment.center,
+                    // color: Colors.red,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Icon(Icons.home, color: Colors.white),
+                        const Icon(Icons.bug_report_outlined,
+                            color: Colors.white),
+                        TextButton(
+                          onPressed: () async {
+                            await _expandOrCollapse();
+                          },
+                          child: Text(isExpanded ? 'Collapse' : 'Expand',
+                              style: const TextStyle(color: Colors.white)),
+                        ),
+                        const Icon(Icons.cloud, color: Colors.white),
+                        const Icon(Icons.flag, color: Colors.white),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -101,11 +103,11 @@ class _MyHomePageState extends State<MyHomePage> {
     var newSize = isExpanded ? const Size(400, 300) : defaultWindowSize;
 
     _resizeWindow(newSize);
-    if (mounted) {
-      setState(() {
-        currentSize = newSize;
-      });
-    }
+    // if (mounted) {
+    //   setState(() {
+    //     currentSize = newSize;
+    //   });
+    // }
   }
 
   void _resizeWindow(Size newSize) async {
